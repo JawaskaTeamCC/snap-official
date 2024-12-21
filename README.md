@@ -15,19 +15,19 @@ Example:
 
 ```
 📁 Argochamber (Organization)
-├── 📜 info.json (Some basic information of your organization)
+├── 📜 info.cfg (Some basic information of your organization)
 │
 ├── 📁 Some Project
 │   ├── 📁 Program A
 │   │   ├── 📁 1.1.1
 │   │   ├── 📁 1.1.2
-|   |   └── 📜 project.json (Keep this up to date!)
+|   |   └── 📜 project.cfg (Keep this up to date!)
 │   └── 📁 Library B
 │
 └── 📁 Snap
     ├── 📁 2.1
     ├── 📁 2.2
-    └── 📜 project.json (Contains version mappings and other information)
+    └── 📜 project.cfg (Contains version mappings and other information, if present)
 ```
 
 ## Usage
