@@ -1,6 +1,6 @@
 # Snap official repo
 
-The (Internal) snap command official repository.
+The ComputerCraft `snap` command official repository.
 
 ## Description
 
