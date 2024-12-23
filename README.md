@@ -4,7 +4,26 @@ The (Internal) snap command official repository.
 
 ## Description
 
-The official repostiroy for the `snap` command.
+The official software repostiroy for the `snap` command.
+
+Here are stored the programs that you can install with it,
+for example to update snap:
+
+```sh
+snap install snap
+```
+
+## Adding your programs and libraries
+
+Is as easy as opening a PR with your folders. It will get accepted
+as long as it respects the mentioned structure, and you don't
+modify anything outside of your organization without permission.
+
+Just fork, upload and ask for a merge PR. If your PR gets rejected
+it may be because youre lacking an essential `.cfg` file (Like `info.cfg`),
+or you didn't add your organization to the public repository list
+(Remember to always append your organization at the end, or the PR will
+be automatically rejected).
 
 ## Structure
 
