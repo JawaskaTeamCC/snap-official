@@ -126,7 +126,7 @@ local function try_install(org, target, version)
     end
     print('Resolving dependencies...')
     for _, dep in ipairs(install_info.dependencies or {}) do
-        local org, target, version = parse_target(v)
+        local org, target, version = parse_target(dep)
         try_install(org, target, version)
     end
     print('Unpacking files...')
