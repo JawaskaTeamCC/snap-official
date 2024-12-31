@@ -19,6 +19,8 @@
 -- SOFTWARE.
 
 -- Messenger for your friends.
+local gl = require 'gl'
+local nucleic = require 'nucleic'
 
 --- CONFIG ---
 settings.define('messenger.server', {
@@ -100,8 +102,6 @@ local function connect(host)
     return true
 end
 
-local gl = require 'gl'
-
 local ui = gl.create_buffer()
 
 -- Text area for messages.
@@ -158,6 +158,64 @@ local function handle_main(state)
     return false
 end
 
+-- TODO
+local function handle_scroll(state)
+    return function(_, dir)
+        state.scroll = state.scroll + dir
+    end
+end
+
+local function should_repaint()
+    os.queueEvent('repaint')
+end
+
+local function handle_key(state)
+    return function(_, key)
+        if key == keys.backspace and #state.input_buffer >= 1 then
+            state.input_buffer = state.input_buffer:sub(1, #state.input_buffer-1)
+            should_repaint()
+        elseif key == keys.leftCtrl then
+            return true
+        elseif key == keys.enter and #state.input_buffer > 0 then
+            local msg = state.input_buffer
+            state.input_buffer = ''
+            send { action = 'message', data = msg }
+            text_area:add_message('$3' .. settings.get('messenger.nick') .. '$8 ' .. msg)
+            should_repaint()
+        end
+    end
+end
+
+local function handle_char(state)
+    return function(_, char)
+        state.input_buffer = state.input_buffer .. char
+        should_repaint()
+    end
+end
+
+local function handle_repaint(state)
+    return function()
+        paint_ui(state)
+    end
+end
+
+local function handle_rednet(state)
+    return function(_, sender, msg)
+        -- Drop messages that are not from the server.
+        if sender ~= host_id then return end
+        if msg.event == 'new_client' then
+            print_system_msg(tostring(msg.nick) .. ' joined')
+        elseif msg.event == 'client_dropped' then
+            print_system_msg(tostring(msg.nick) .. ' left')
+        elseif msg.event == 'message' then
+            text_area:add_message('$b' .. msg.nick .. '$0 ' .. msg.message)
+        else
+            print_system_msg('Unknown netmsg "' .. tostring(msg.event) .. '"')
+        end
+        should_repaint()
+    end
+end
+
 local function main()
     term.setCursorBlink(false)
     term.clear()
@@ -175,7 +233,13 @@ local function main()
     }
     print_system_msg('Connected as ' .. settings.get('messenger.nick'))
     paint_ui(state)
-    repeat until handle_main(state)
+    nucleic.loop {
+        rednet_message = handle_rednet(state),
+        mouse_scroll = handle_scroll(state),
+        key = handle_key(state),
+        char = handle_char(state),
+        repaint = handle_repaint(state)
+    }
     send({ action = 'disconnect' })
     term.clear()
     term.setCursorPos(1, 1)
